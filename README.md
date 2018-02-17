@@ -20,6 +20,8 @@
 [download-image]: https://img.shields.io/npm/dm/egg-eventsource.svg?style=flat-square
 [download-url]: https://npmjs.org/package/egg-eventsource
 
+> 基于eventsource的server到client的单向推送插件
+
 ## 开启插件
 
 ```js
@@ -60,7 +62,7 @@ app.eventsource.broadcast('customevent', 'this is an customevent message'); // �
 
 ## 提问交流
 
-请到 [egg issues](https://github.com/yongbo000/egg/issues) 异步交流。
+请到 [egg issues](https://github.com/yongbo000/egg-eventsource/issues) 异步交流。
 
 ## License
 
