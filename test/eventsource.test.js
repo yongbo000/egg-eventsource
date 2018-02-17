@@ -35,35 +35,35 @@ describe('test/eventsource.test.js', () => {
       client1 = new EventSource(url);
       client2 = new EventSource(url);
     });
-  
+
     it('should eventsource work well', done => {
       const msgQueue1 = Array.from(msgQueue);
       const msgQueue2 = Array.from(msgQueue);
-  
+
       client1.on('heartbeat', msgEvent => {
         assert(msgEvent.type === 'heartbeat');
         assert(msgEvent.data === 'this is a heartbeat message');
         ep.emit('client1_heartbeat_work');
       });
-  
+
       client1.on('message', msgEvent => {
         assert(msgEvent.type === 'message');
         assert(msgEvent.data === msgQueue1.pop());
         ep.emit('client1_message_work');
       });
-  
+
       client2.on('heartbeat', msgEvent => {
         assert(msgEvent.type === 'heartbeat');
         assert(msgEvent.data === 'this is a heartbeat message');
         ep.emit('client2_heartbeat_work');
       });
-  
+
       client2.on('message', msgEvent => {
         assert(msgEvent.type === 'message');
         assert(msgEvent.data === msgQueue2.pop());
         ep.emit('client2_message_work');
       });
-  
+
       ep.all('client1_heartbeat_work', 'client1_message_work', () => {
         ep.emit('client1_done');
       });
@@ -71,7 +71,7 @@ describe('test/eventsource.test.js', () => {
         ep.emit('client2_done');
       });
       ep.all('client1_done', 'client2_done', done);
-  
+
       client1.on('open', () => ep.emit('client1_open'));
       client2.on('open', () => ep.emit('client2_open'));
       ep.all('client1_open', 'client2_open', () => {
