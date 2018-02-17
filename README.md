@@ -9,54 +9,58 @@
 
 [npm-image]: https://img.shields.io/npm/v/egg-eventsource.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/egg-eventsource
-[travis-image]: https://img.shields.io/travis/eggjs/egg-eventsource.svg?style=flat-square
-[travis-url]: https://travis-ci.org/eggjs/egg-eventsource
-[codecov-image]: https://img.shields.io/codecov/c/github/eggjs/egg-eventsource.svg?style=flat-square
-[codecov-url]: https://codecov.io/github/eggjs/egg-eventsource?branch=master
-[david-image]: https://img.shields.io/david/eggjs/egg-eventsource.svg?style=flat-square
-[david-url]: https://david-dm.org/eggjs/egg-eventsource
+[travis-image]: https://img.shields.io/travis/yongbo000/egg-eventsource.svg?style=flat-square
+[travis-url]: https://travis-ci.org/yongbo000/egg-eventsource
+[codecov-image]: https://img.shields.io/codecov/c/github/yongbo000/egg-eventsource.svg?style=flat-square
+[codecov-url]: https://codecov.io/github/yongbo000/egg-eventsource?branch=master
+[david-image]: https://img.shields.io/david/yongbo000/egg-eventsource.svg?style=flat-square
+[david-url]: https://david-dm.org/yongbo000/egg-eventsource
 [snyk-image]: https://snyk.io/test/npm/egg-eventsource/badge.svg?style=flat-square
 [snyk-url]: https://snyk.io/test/npm/egg-eventsource
 [download-image]: https://img.shields.io/npm/dm/egg-eventsource.svg?style=flat-square
 [download-url]: https://npmjs.org/package/egg-eventsource
 
-<!--
-Description here.
--->
-
-## Install
-
-```bash
-$ npm i egg-eventsource --save
-```
-
-## Usage
+## 开启插件
 
 ```js
-// {app_root}/config/plugin.js
+// config/plugin.js
 exports.eventsource = {
   enable: true,
   package: 'egg-eventsource',
 };
 ```
 
-## Configuration
+## 使用场景
+
+`client`
 
 ```js
-// {app_root}/config/config.default.js
-exports.eventsource = {
-};
+// 接收服务器推送数据
+const es = new EventSource('{base}/__eventsource');
+es.on('message', (msgEvent) => {
+  console.log(msgEvent.data);
+});
+
+es.on('customevent', (msgEvent) => {
+  console.log(msgEvent.data);
+});
 ```
 
-see [config/config.default.js](config/config.default.js) for more detail.
+`server`
 
-## Example
+```js
+// broadcast向所有client推送数据
+app.eventsource.broadcast('this is an test message'); // 默认message类型
+app.eventsource.broadcast('customevent', 'this is an customevent message'); // 自定义接收类型
+```
 
-<!-- example here -->
+## 详细配置
 
-## Questions & Suggestions
+请到 [config/config.default.js](config/config.default.js) 查看详细配置项说明。
 
-Please open an issue [here](https://github.com/eggjs/egg/issues).
+## 提问交流
+
+请到 [egg issues](https://github.com/yongbo000/egg/issues) 异步交流。
 
 ## License
 
