@@ -1,6 +1,6 @@
 {
   "name": "egg-eventsource",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "an egg plugin for eventsource",
   "eggPlugin": {
     "name": "eventsource"
