@@ -42,7 +42,9 @@ describe('test/eventsource.test.js', () => {
 
       client1.on('heartbeat', msgEvent => {
         assert(msgEvent.type === 'heartbeat');
-        assert(msgEvent.data === 'this is a heartbeat message');
+        const data = JSON.parse(msgEvent.data);
+        assert(data.aliveClients === 2);
+        assert(data.message === 'this is a heartbeat message');
         ep.emit('client1_heartbeat_work');
       });
 
@@ -54,7 +56,9 @@ describe('test/eventsource.test.js', () => {
 
       client2.on('heartbeat', msgEvent => {
         assert(msgEvent.type === 'heartbeat');
-        assert(msgEvent.data === 'this is a heartbeat message');
+        const data = JSON.parse(msgEvent.data);
+        assert(data.aliveClients === 2);
+        assert(data.message === 'this is a heartbeat message');
         ep.emit('client2_heartbeat_work');
       });
 
