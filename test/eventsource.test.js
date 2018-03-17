@@ -44,6 +44,7 @@ describe('test/eventsource.test.js', () => {
         assert(msgEvent.type === 'heartbeat');
         const data = JSON.parse(msgEvent.data);
         assert(data.aliveClients === 2);
+        assert(data.hasOwnProperty('clientId'));
         assert(data.message === 'this is a heartbeat message');
         ep.emit('client1_heartbeat_work');
       });
@@ -58,6 +59,7 @@ describe('test/eventsource.test.js', () => {
         assert(msgEvent.type === 'heartbeat');
         const data = JSON.parse(msgEvent.data);
         assert(data.aliveClients === 2);
+        assert(data.hasOwnProperty('clientId'));
         assert(data.message === 'this is a heartbeat message');
         ep.emit('client2_heartbeat_work');
       });
@@ -79,7 +81,7 @@ describe('test/eventsource.test.js', () => {
       client1.on('open', () => ep.emit('client1_open'));
       client2.on('open', () => ep.emit('client2_open'));
       ep.all('client1_open', 'client2_open', () => {
-        app.eventsource.broadcast('this is a test message 1');
+        app.eventsource.broadcast('message', 'this is a test message 1');
         app.eventsource.broadcast('message', 'this is a test message 2');
       });
     });
