@@ -82,7 +82,11 @@ describe('test/eventsource.test.js', () => {
       client2.on('open', () => ep.emit('client2_open'));
       ep.all('client1_open', 'client2_open', () => {
         app.eventsource.broadcast('message', 'this is a test message 1');
-        app.eventsource.broadcast('message', 'this is a test message 2');
+        // app.eventsource.broadcast('message', 'this is a test message 2');
+        app.eventsource.broadcast(client => {
+          client.write('event: message');
+          client.write('data: this is a test message 1');
+        });
       });
     });
   });
