@@ -51,9 +51,12 @@ es.on('customevent', (msgEvent) => {
 `server`
 
 ```js
-// broadcast向所有client推送数据
+// broadcast向所有client推送数据,多线程模型下broadcast只会向当前worker线程推送
 app.eventsource.broadcast('this is an test message'); // 默认message类型
 app.eventsource.broadcast('customevent', 'this is an customevent message'); // 自定义接收类型
+
+// 向全部worker线程推送
+app.eventsource.sendToAllWorkers('this is an test message');
 ```
 
 ## 详细配置
