@@ -23,10 +23,12 @@ describe('test/eventsource.test.js', () => {
   let client2;
 
   const msgQueue = [
-    'this is a test message 3',
-    'this is a test message 2',
     'this is a test message 1',
+    'this is a test message 2',
+    'this is a test message 3',
+    JSON.stringify({ msg: 'this is a test message 4' }),
   ];
+  const len = msgQueue.length;
 
   describe('path match /__eventsource', () => {
     beforeEach(() => {
@@ -36,7 +38,7 @@ describe('test/eventsource.test.js', () => {
       client2 = new EventSource(url);
     });
 
-    it('should eventsource work well', done => {
+    it.only('should eventsource work well', done => {
       const msgQueue1 = Array.from(msgQueue);
       const msgQueue2 = Array.from(msgQueue);
 
@@ -51,8 +53,8 @@ describe('test/eventsource.test.js', () => {
 
       client1.on('message', msgEvent => {
         assert(msgEvent.type === 'message');
-        assert(msgEvent.data === msgQueue1.pop());
-        ep.emit('client1_message_work');
+        assert(msgEvent.data === msgQueue1.shift());
+        ep.emit(`client1_message_${len - msgQueue1.length}_work`);
       });
 
       client2.on('heartbeat', msgEvent => {
@@ -66,14 +68,17 @@ describe('test/eventsource.test.js', () => {
 
       client2.on('message', msgEvent => {
         assert(msgEvent.type === 'message');
-        assert(msgEvent.data === msgQueue2.pop());
-        ep.emit('client2_message_work');
+        assert(msgEvent.data === msgQueue2.shift());
+        ep.emit(`client2_message_${len - msgQueue2.length}_work`);
       });
 
-      ep.all('client1_heartbeat_work', 'client1_message_work', () => {
+      const evtList1 = [ 1, 2, 3, 4 ].map(v => `client1_message_${v}_work`);
+      const evtList2 = [ 1, 2, 3, 4 ].map(v => `client2_message_${v}_work`);
+
+      ep.all('client1_heartbeat_work', ...evtList1, () => {
         ep.emit('client1_done');
       });
-      ep.all('client2_heartbeat_work', 'client2_message_work', () => {
+      ep.all('client2_heartbeat_work', ...evtList2, () => {
         ep.emit('client2_done');
       });
       ep.all('client1_done', 'client2_done', done);
@@ -82,11 +87,12 @@ describe('test/eventsource.test.js', () => {
       client2.on('open', () => ep.emit('client2_open'));
       ep.all('client1_open', 'client2_open', () => {
         app.eventsource.broadcast('message', 'this is a test message 1');
-        // app.eventsource.broadcast('message', 'this is a test message 2');
+        app.eventsource.broadcast('this is a test message 2');
         app.eventsource.broadcast(client => {
-          client.write('event: message');
-          client.write('data: this is a test message 1');
+          client.write('event: message\n');
+          client.write('data: this is a test message 3\n\n');
         });
+        app.eventsource.sendToAllWorkers('message', { msg: 'this is a test message 4' });
       });
     });
   });
