@@ -38,7 +38,7 @@ describe('test/eventsource.test.js', () => {
       client2 = new EventSource(url);
     });
 
-    it.only('should eventsource work well', done => {
+    it('should eventsource work well', done => {
       const msgQueue1 = Array.from(msgQueue);
       const msgQueue2 = Array.from(msgQueue);
 
