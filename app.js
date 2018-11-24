@@ -6,6 +6,8 @@ module.exports = app => {
   app.eventsource = new EventStream({
     logger: app.logger,
     heartbeat: app.config.eventsource.heartbeat,
+    defaultDataId: app.config.eventsource.defaultDataId,
+    dataIdSeparator: app.config.eventsource.dataIdSeparator,
   });
   Object.defineProperty(app.eventsource, 'sendToAllWorkers', {
     value: (event, data) => {
