@@ -20,7 +20,7 @@
 [download-image]: https://img.shields.io/npm/dm/egg-eventsource.svg?style=flat-square
 [download-url]: https://npmjs.org/package/egg-eventsource
 
-> 基于eventsource的server到client的单向推送插件
+> 基于eventsource的server到client的单向推送插件，支持client分组订阅
 
 ## 开启插件
 
@@ -46,6 +46,10 @@ es.on('message', (msgEvent) => {
 es.on('customevent', (msgEvent) => {
   console.log(msgEvent.data);
 });
+
+// 只监听某个namespace下的topic
+const es2 = new EventSource('{base}/__eventsource?dataId={namespace}.{topic}');
+es.on('{eventName}', (msg) => console.log(msg));
 ```
 
 `server`
@@ -57,6 +61,11 @@ app.eventsource.broadcast('customevent', 'this is an customevent message'); // �
 
 // 向全部worker线程推送
 app.eventsource.sendToAllWorkers('this is an test message');
+
+// 向某个分组的client发送消息
+app.eventsource.broadcast('{eventName}#{namespace}.{topic}', 'this is an test message');
+// or
+app.eventsource.sendToAllWorkers('{eventName}#{namespace}.{topic}', 'this is an test message');
 ```
 
 ## 详细配置
