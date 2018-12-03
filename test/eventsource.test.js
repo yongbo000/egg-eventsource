@@ -23,6 +23,7 @@ describe('test/eventsource.test.js', () => {
   let client2;
   let client3;
   let client4;
+  let client5;
 
   const msgQueue = [
     'this is a test message 1',
@@ -31,7 +32,7 @@ describe('test/eventsource.test.js', () => {
     JSON.stringify({ msg: 'this is a test message 4' }),
   ];
   const len = msgQueue.length;
-  let aliveClients = 4;
+  let aliveClients = 5;
 
   describe('path match /__eventsource', () => {
     beforeEach(() => {
@@ -41,6 +42,7 @@ describe('test/eventsource.test.js', () => {
       client2 = new EventSource(url);
       client3 = new EventSource(url + '?dataId=es.test');
       client4 = new EventSource(url);
+      client5 = new EventSource(url + '?dataId=es.client5');
     });
 
     it('should eventsource work well', done => {
@@ -86,14 +88,15 @@ describe('test/eventsource.test.js', () => {
       ep.all('client2_heartbeat_work', ...evtList2, () => {
         ep.emit('client2_done');
       });
-      ep.all('client1_done', 'client2_done', 'client3_done', 'client4_done', done);
+      ep.all('client1_done', 'client2_done', 'client3_done', 'client4_done', 'client5_done', done);
 
       client1.on('open', () => ep.emit('client1_open'));
       client2.on('open', () => ep.emit('client2_open'));
       client3.on('open', () => ep.emit('client3_open'));
       client4.on('open', () => ep.emit('client4_open'));
+      client5.on('open', () => ep.emit('client5_open'));
 
-      ep.all('client1_open', 'client2_open', 'client3_open', 'client4_open', () => {
+      ep.all('client1_open', 'client2_open', 'client3_open', 'client4_open', 'client5_open', () => {
         app.eventsource.broadcast('message', 'this is a test message 1');
         app.eventsource.broadcast('this is a test message 2');
         app.eventsource.broadcast(client => {
@@ -105,6 +108,16 @@ describe('test/eventsource.test.js', () => {
 
         assert(app.eventsource.idGroups[app.config.eventsource.defaultDataId].length === 3);
         assert(app.eventsource.idGroups['es.test'].length === 1);
+
+        const send = async data => {
+          app.eventsource.broadcast('message#es.client5', `this is a message ${data}`);
+        };
+        for (let i = 0; i < 100; i++) {
+          send(`worker1 ==========+> ${i}`);
+          send(`worker2 ==========+> ${i}`);
+          send(`worker3 ==========+> ${i}`);
+          send(`worker4 ==========+> ${i}`);
+        }
       });
 
       client3.on('message', msgEvent => {
@@ -121,6 +134,14 @@ describe('test/eventsource.test.js', () => {
           assert(app.eventsource.idGroups['es.test'].length === 1);
           ep.emit('client4_done');
         }, 1000);
+      });
+
+      let msgCount = 0;
+      client5.on('message', () => {
+        msgCount++;
+        if (msgCount === 400) {
+          ep.emit('client5_done');
+        }
       });
     });
   });
